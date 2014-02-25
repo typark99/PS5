@@ -68,12 +68,19 @@ mat.voters<-call.voters(1000, method="snormal")
 
 ###
 parties<-call.voters(2, method="normal")
-parties
 
 distance<-function(voters,parties){
   require(pdist)
-  mat.distance<-pdist(voters, parties)
-  party1<-as.numeric(mat.distance[,1]>mat.distance[,2])
+  mat.distance<-as.matrix(pdist(voters[,2:3], parties[,2:3]))  ##matrix of distances from voter to party - rows are voters, columns are parties
+  return(as.numeric(mat.distance[,1]>mat.distance[,2]))  ##returns a vector of 0's for voters closer to party 1, and 1 for voters closer to party 2
 }
 
-plot(mat.voters[])
+visualize<-function(voters,parties){
+  affiliate<-distance(voters,parties)  ##returns a vector with 0's indicating affiliation with party 1
+  plot(voters[,2],voters[,3],col=ifelse(affiliate,"red","blue"),pch=20)  ##plot voters - affiliation with party 1 is blue, party 2 is red
+  points(parties[,2],parties[,3],col="black",bg=c("blue","red"),pch=23,cex=2,lwd=2)  ##plot parties as diamonds - party 1 is blue, 2 is red
+  abline(h=0)
+  abline(v=0)
+}
+
+
