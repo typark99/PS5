@@ -95,23 +95,35 @@ master<-function(iter=1000,n=1000, mu=0, Mu=c(0,0), Mu1=c(0,0), Mu2=c(0,0), Mu3=
   require(animation)
   out.mat1<-matrix(ncol=2,nrow=iter)  ##matrix for party 1's position at each iteration
   out.mat2<-matrix(ncol=2,nrow=iter)  ##matrix for party 2's positions
-  saveLatex(expr=
-              for(i in 1:15){
-                out.mat1[i,]<-parties[1,2:3]
-                out.mat2[i,]<-parties[2,2:3]
-                affiliate<-distance(voters,parties)  ##returns a vector with 0's indicating affiliation with party 1
-                visualize(voters,parties)  ##visualize first 15 iterations in animation
-                parties<-relocate(voters,parties) ##reassign parties to means of voters that supported them
-              },img.name="Rplot",overwrite=TRUE)
+  if(iter>15){
+   saveLatex(expr=   ##creates animation of first 15 iterations and creates a pdf
+                for(i in 1:15){
+                  out.mat1[i,]<-parties[1,2:3]  ##assigns i-th row of output matrix for party 1 the i-th party position
+                  out.mat2[i,]<-parties[2,2:3]  ##assigns i-th row of output matrix for party 2 the i-th party position
+                  affiliate<-distance(voters,parties)  ##returns a vector with 0's indicating affiliation with party 1
+                  visualize(voters,parties)  ##visualize iterations in animation
+                  parties<-relocate(voters,parties) ##reassign parties to means of voters that supported them
+                },img.name="Rplot",overwrite=TRUE)
  
-  for(k in 16:iter){
-    out.mat1[k,]<-parties[1,2:3]
-    out.mat2[k,]<-parties[2,2:3]
-    affiliate<-distance(voters,parties)  ##returns a vector with 0's indicating affiliation with party 1
-    parties<-relocate(voters,parties) ##reassign parties to means of voters that supported them
+    for(k in 16:iter){  ##continues simulation for remaining iterations
+      out.mat1[k,]<-parties[1,2:3]
+      out.mat2[k,]<-parties[2,2:3]
+      affiliate<-distance(voters,parties)  ##returns a vector with 0's indicating affiliation with party 1
+      parties<-relocate(voters,parties) ##reassign parties to means of voters that supported them
+    }
+  }else{
+    saveLatex(expr=   ##creates animation of all iterations and creates a pdf
+                for(i in 1:iter){
+                  out.mat1[i,]<-parties[1,2:3]  ##assigns i-th row of output matrix for party 1 the i-th party position
+                  out.mat2[i,]<-parties[2,2:3]  ##assigns i-th row of output matrix for party 2 the i-th party position
+                  affiliate<-distance(voters,parties)  ##returns a vector with 0's indicating affiliation with party 1
+                  visualize(voters,parties)  ##visualize iterations in animation
+                  parties<-relocate(voters,parties) ##reassign parties to means of voters that supported them
+                },img.name="Rplot",overwrite=TRUE)
+    
   }
 
-  return(list(out.mat1,out.mat2))
+  return(list(out.mat1,out.mat2))  ##return party positions as list. First element is matrix of party 1's positions, second element is matrix of party 2's
 }
 
 
