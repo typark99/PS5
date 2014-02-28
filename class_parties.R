@@ -202,6 +202,44 @@ master<-function(iter=1500,n=1000, mu=0, Mu=c(0,0), Mu1=c(0,0), Mu2=c(0,0), Mu3=
 }
 
 
+master<-function(iter=15,n=100, mu=0, Mu=c(0,0), Mu1=c(0,0), Mu2=c(0,0), Mu3=c(0,0), r=3, sigma1=2, sigma2=2, Sigma=matrix(c(1,0,0,1),nrow=2), a=0, b=1, method="normal",seed=.Random.seed[2]){
+  set.seed(seed)
+  voters<-call.voters(n, mu, Mu, Mu1, Mu2, Mu3, r, sigma1, sigma2, Sigma, a, b, method)  ##sets up random voters with specified method and parameters
+  parties<-call.voters(2, mu, Mu, Mu1, Mu2, Mu3, r, sigma1, sigma2, Sigma, a, b, method)  ##sets up 2 random parties with specified method and parameters
+  out.mat1<-matrix(ncol=2,nrow=iter)  ##matrix for party 1's position at each iteration
+  out.mat2<-matrix(ncol=2,nrow=iter)
+  output<-array()##matrix for party 2's positions
+  if(iter>15){   ##creates animation of first 15 iterations and creates a pdf
+                for(i in 1:15){
+                  out.mat1[i,]<-parties[1,]  ##assigns i-th row of output matrix for party 1 the i-th party position
+                  out.mat2[i,]<-parties[2,]  ##assigns i-th row of output matrix for party 2 the i-th party position
+                  affiliate<-distance(voters,parties)  ##returns a vector with 0's indicating affiliation with party 1
+                  visualize(voters,parties)  ##visualize iterations in animation
+                  parties<-relocate(voters,parties) ##reassign parties to means of voters that supported them
+                }
+    
+    for(k in 16:iter){  ##continues simulation for remaining iterations
+      out.mat1[k,]<-parties[1,]
+      out.mat2[k,]<-parties[2,]
+      affiliate<-distance(voters,parties)  ##returns a vector with 0's indicating affiliation with party 1
+      parties<-relocate(voters,parties) ##reassign parties to means of voters that supported them
+    }
+  }else{ ##creates animation of all iterations and creates a pdf
+                for(i in 1:iter){
+                  out.mat1[i,]<-parties[1,]  ##assigns i-th row of output matrix for party 1 the i-th party position
+                  out.mat2[i,]<-parties[2,]  ##assigns i-th row of output matrix for party 2 the i-th party position
+                  affiliate<-distance(voters,parties)  ##returns a vector with 0's indicating affiliation with party 1
+                  visualize(voters,parties)  ##visualize iterations in animation
+                  parties<-relocate(voters,parties) ##reassign parties to means of voters that supported them
+                }
+    
+  }
+  
+  output<-list(out.mat1,out.mat2) 
+  return(output)##return party positions as list. First element is matrix of party 1's positions, second element is matrix of party 2's
+}
+
+
 
 ### 3. Use the expand.grid() function to set up a data frame of possible parameters to explore ###
 
@@ -220,10 +258,9 @@ parameters<-data.frame(expand.grid(mu, sigma1, sigma2, a, b, method)) # 64 obser
 colnames(parameters)<-c("mu", "sigma1", "sigma2", "a", "b", "method")
 
 
-
-master<-function(iter=5, n=10, mu, Mu=c(0,0), Mu1=c(0,0), Mu2=c(0,0), Mu3=c(0,0), r=3, sigma1, sigma2, Sigma=matrix(c(1,0,0,1),nrow=2), a, b, method, seed=.Random.seed[2]){
+master<-function(iter=15, n=100, mu, Mu=c(0,0), Mu1=c(0,0), Mu2=c(0,0), Mu3=c(0,0), r=3, sigma1, sigma2, Sigma=matrix(c(1,0,0,1),nrow=2), a, b, method, seed=.Random.seed[2]){
   set.seed(seed)
-  output<-array()
+  output<-list()
   for(j in 1:nrow(parameters)){
     voters<-call.voters(n, Mu, Mu1, Mu2, Mu3, r, Sigma, 
                         mu=parameters[j,1], sigma1=parameters[j,2],
@@ -257,11 +294,12 @@ master<-function(iter=5, n=10, mu, Mu=c(0,0), Mu1=c(0,0), Mu2=c(0,0), Mu3=c(0,0)
       affiliate<-distance(voters,parties)  ##returns a vector with 0's indicating affiliation with party 1
       visualize(voters,parties)  ##visualize iterations in animation
       parties<-relocate(voters,parties) ##reassign parties to means of voters that supported them
+    }         
     }
-            
-    }
-    output[j]<-list(out.mat1,out.mat2)  ##return party positions as list. First element is matrix of party 1's positions, second element is matrix of party 2's
+    output[[j]]<-list(out.mat1,out.mat2)  ##return party positions as list. First element is matrix of party 1's positions, second element is matrix of party 2's
   }
   return(output)
 }
 
+## CAUTION: when n is not large enough, this function may be break down, since every voter could be closer to one particular party.
+## But, we found that if n is large enough (say 100), it would be extremely rare (almost zero possibility) to have this kind of situation. 
