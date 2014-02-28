@@ -258,7 +258,8 @@ parameters<-data.frame(expand.grid(mu, sigma1, sigma2, a, b, method)) # 64 obser
 colnames(parameters)<-c("mu", "sigma1", "sigma2", "a", "b", "method")
 
 
-master<-function(iter=15, n=100, mu, Mu=c(0,0), Mu1=c(0,0), Mu2=c(0,0), Mu3=c(0,0), r=3, sigma1, sigma2, Sigma=matrix(c(1,0,0,1),nrow=2), a, b, method, seed=.Random.seed[2]){
+## For this particular problem, we omit the visualization part of the function, since the function would produce 64 plots in this particular case, which are not required for this problem.   
+masterParameters<-function(iter=15, n=100, mu, Mu=c(0,0), Mu1=c(0,0), Mu2=c(0,0), Mu3=c(0,0), r=3, sigma1, sigma2, Sigma=matrix(c(1,0,0,1),nrow=2), a, b, method, seed=.Random.seed[2]){
   set.seed(seed)
   output<-list()
   for(j in 1:nrow(parameters)){
@@ -278,7 +279,6 @@ master<-function(iter=15, n=100, mu, Mu=c(0,0), Mu1=c(0,0), Mu2=c(0,0), Mu3=c(0,
         out.mat1[i,]<-parties[1,]  ##assigns i-th row of output matrix for party 1 the i-th party position
         out.mat2[i,]<-parties[2,]  ##assigns i-th row of output matrix for party 2 the i-th party position
         affiliate<-distance(voters,parties)  ##returns a vector with 0's indicating affiliation with party 1
-        visualize(voters,parties)  ##visualize iterations in animation
         parties<-relocate(voters,parties) ##reassign parties to means of voters that supported them
       }
       
@@ -292,7 +292,6 @@ master<-function(iter=15, n=100, mu, Mu=c(0,0), Mu1=c(0,0), Mu2=c(0,0), Mu3=c(0,
       out.mat1[i,]<-parties[1,]  ##assigns i-th row of output matrix for party 1 the i-th party position
       out.mat2[i,]<-parties[2,]  ##assigns i-th row of output matrix for party 2 the i-th party position
       affiliate<-distance(voters,parties)  ##returns a vector with 0's indicating affiliation with party 1
-      visualize(voters,parties)  ##visualize iterations in animation
       parties<-relocate(voters,parties) ##reassign parties to means of voters that supported them
     }         
     }
@@ -300,6 +299,13 @@ master<-function(iter=15, n=100, mu, Mu=c(0,0), Mu1=c(0,0), Mu2=c(0,0), Mu3=c(0,
   }
   return(output)
 }
-
-## CAUTION: when n is not large enough, this function may be break down, since every voter could be closer to one particular party.
+## You may run masterParameters() to see if this function works. It will return 64 lists. And under each list, there will be two lists.
+## CAUTION: when n is not large enough, this function may break down, since every voter could be closer to one particular party.
 ## But, we found that if n is large enough (say 100), it would be extremely rare (almost zero possibility) to have this kind of situation. 
+
+
+
+### 4. Use a plot to characterize some comparative static of interest ###
+
+
+
